@@ -24,55 +24,45 @@ promoZapatos.addEventListener("mousemove", function (event) {
 });
 
 // SLIDER PRODUCTOS
-const slider = document.querySelector('.slider-container');
-const prevBtn = document.querySelector('.prev');
-const nextBtn = document.querySelector('.next');
-const slideWidth = document.querySelector('.slide').offsetWidth;
-let position = 0;
-let intervalId = null;
+const slider = document.querySelector('.slider');
+const sliderContainer = document.querySelector('.slider-container');
+const slides = document.querySelectorAll('.slide');
+const prevButton = document.querySelector('.prev');
+const nextButton = document.querySelector('.next');
+let currentIndex = 0;
+const slideInterval = 5000; 
 
-// Función para cambiar la imagen automáticamente cada 10 segundos
-function startAutoSlide() {
-  intervalId = setInterval(() => {
-    if (position > -(slider.offsetWidth - slideWidth)) {
-      position -= slideWidth;
-      slider.style.transform = `translateX(${position}px)`;
-    } else {
-      position = 0;
-      slider.style.transform = 'translateX(0)';
-    }
-  }, 10000);
+
+function nextSlide() {
+  currentIndex = (currentIndex + 1) % slides.length;
+  updateSlider();
 }
 
-// Función para detener el cambio automático de imágenes
-function stopAutoSlide() {
-  clearInterval(intervalId);
+
+function prevSlide() {
+  currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+  updateSlider();
 }
 
-nextBtn.addEventListener('click', () => {
-  if (position > -(slider.offsetWidth - slideWidth)) {
-    position -= slideWidth;
-    slider.style.transform = `translateX(${position}px)`;
-  }
+function updateSlider() {
+  const slideWidth = slides[currentIndex].offsetWidth;
+  const containerWidth = slider.offsetWidth;
+  const position = (containerWidth / 2) - (slideWidth / 2) - (currentIndex * (slideWidth + 20));
+  sliderContainer.style.transform = `translateX(${position}px)`;
+}
+
+nextButton.addEventListener('click', () => {
+  nextSlide();
 });
 
-prevBtn.addEventListener('click', () => {
-  if (position < 0) {
-    position += slideWidth;
-    slider.style.transform = `translateX(${position}px)`;
-  }
+prevButton.addEventListener('click', () => {
+  prevSlide();
 });
 
-// Iniciar el cambio automático de imágenes al cargar la página
-startAutoSlide();
+setInterval(() => {
+  nextSlide();
+}, slideInterval);
 
-// Detener el cambio automático de imágenes al pasar el mouse sobre el carrusel
-slider.addEventListener('mouseenter', stopAutoSlide);
-
-// Reanudar el cambio automático de imágenes al quitar el mouse del carrusel
-slider.addEventListener('mouseleave', startAutoSlide);
-
-window.addEventListener('resize', () => {
-  position = 0;
-  slider.style.transform = 'translateX(0)';
+window.addEventListener('load', () => {
+  updateSlider();
 });
